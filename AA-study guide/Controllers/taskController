@@ -1,0 +1,61 @@
+module.exports = {
+const db = require('../models/TaskModel');
+
+const taskController = {};
+
+taskController.getTask = (req, res, next) => {
+  // create the SQL command for the data you are trying to find from the requests
+  const text = 'SELECT * FROM Tasks';
+  // then use the command to query the database and populate the res.locals
+  db.query(text, (err, qres) => {
+    if (err) {
+      return next(err);
+    } else {
+      res.locals.msgs = qres.rows;
+      return next();
+    }
+  });
+};
+
+taskController.postTask = (req, res, next) => {
+  console.log('running createMsgs middleware');
+  // First find what variables are in the requests from the server
+  const { item, created_at } = req.body;
+
+  // then create the SQL command for the data you are trying to find from the requests
+  const text = 'INSERT INTO Tasks (item, created_at) VALUES ($1, $2) RETURNING *'; // depends on the array to make it DYNAMIC
+
+  const params = [item, created_at];
+  // then use the command to query the database 
+  db.query(text, params, (err, qres) => {
+    if (err) {
+      return next(err);
+    } else {
+      // console.log(qres);
+      res.locals.msgs = qres.rows;
+      return next();
+    }
+  });
+};
+
+taskController.deleteTask = (req, res, next) => {
+  // First find what variables are in the requests from the server
+  const id = req.body.id;
+  console.log(id);
+  // then create the SQL command for the data you are trying to find from the requests
+  const text = 'DELETE FROM Tasks WHERE id = $1';
+  // if (req.cookies.pass === req.body.data.password) {
+  // then use the command to query the database 
+  db.query(text, [id], (err, qres) => {
+    if (err) {
+      return next(err);
+    } 
+    else {
+      res.locals.msgs = qres.rows;
+      return next();
+    }
+  });
+};
+
+
+module.exports = taskController;

@@ -1,0 +1,30 @@
+module.exports = {
+const authController = {};
+
+authController.loginVerifier = (req, res, next) => {
+  // console.log(req.body);
+  if (req.body.user === 'codesmith' && req.body.pass === 'ilovetesting') {
+    return next();
+  }
+  else 
+    return res.send('unsuccessful login attempt');
+};
+
+authController.setCookie = (req, res, next) => {
+  // console.log(req.body.password);
+  const cookie = res.cookie('token', 'admin', {
+    HttpOnly: true,
+    secure: true,
+  });
+  return next();
+};
+
+authController.checkCookie = (req, res, next) => {
+  console.log(req.cookies);
+  if (!req.cookies || req.cookies.token !== 'admin') {
+    return res.send('You must be signed in to view this page');
+  }
+  else return next();
+};
+
+module.exports = authController; 
